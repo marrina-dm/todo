@@ -1,0 +1,97 @@
+.header {
+  padding: 10px 0;
+
+  .header-title {
+    text-align: center;
+    font-size: 80px;
+    font-weight: 400;
+    color: #b83f45;
+    line-height: 1;
+  }
+}
+
+.todo {
+  .container {
+    box-shadow: 0 2px 4px #0003, 0 25px 50px #0000001a;
+  }
+
+  .todo-head {
+    position: relative;
+    z-index: 1;
+
+    .toggle-all-btn {
+      position: absolute;
+      height: 100%;
+      width: 50px;
+
+      svg path {
+        fill: #989898;
+      }
+
+      &.all-completed svg path {
+        fill: #000000;
+      }
+    }
+  }
+
+  .todo-actions {
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #ffffff;
+
+    .mat-button-toggle-group {
+      padding: 10px;
+      gap: 5px;
+    }
+
+    .mat-button-toggle-standalone:not([class*=mat-elevation-z]), .mat-button-toggle-group:not([class*=mat-elevation-z]) {
+      box-shadow: none;
+
+      .mat-button-toggle {
+        color: #000000;
+        border: 1px solid transparent;
+        border-radius: 5px;
+
+        &:hover {
+          border-color: #b83f45;
+        }
+
+        &.cdk-focused {
+          box-shadow: 0 0 2px 2px #cf7d7d;
+        }
+
+        ::ng-deep .mat-button-toggle-label-content {
+          padding: 0 10px;
+        }
+
+        &.mat-button-toggle-checked {
+          background-color: transparent;
+          border: 1px solid #b83f45;
+
+          ::ng-deep .mat-pseudo-checkbox {
+            display: none!important;
+          }
+        }
+      }
+    }
+
+    .clear-completed-tasks:hover {
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
+  }
+}
+
+.footer {
+  padding: 40px 0;
+  text-align: center;
+
+  .footer-info {
+    font-size: 11px;
+    color: #4d4d4d;
+  }
+}
