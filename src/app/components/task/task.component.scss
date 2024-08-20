@@ -1,0 +1,91 @@
+.task {
+  position: relative;
+  z-index: 0;
+
+  &:focus {
+    box-shadow: 0 0 2px 2px #cf7d7d;
+    z-index: 2;
+  }
+
+  &:has(> input[type='text']:focus) {
+    z-index: 2;
+  }
+
+  .check-task {
+    display: flex;
+    padding: 16px;
+    font-size: 24px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #e6e6e6;
+    color: #111111;
+    width: 100%;
+    background-color: #ffffff;
+
+    label {
+      width: 50px;
+
+      &::before {
+        position: absolute;
+        content: '';
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 1px solid #989898;
+        left: 12px;
+        top: calc(50% - 13px);
+      }
+
+      &:has(>input:checked) + span {
+        color: #989898;
+        text-decoration: line-through;
+      }
+
+      &:has(>input:checked)::before {
+        border-color: green;
+      }
+
+      &:has(>input:checked)::after {
+        content: url("../../../assets/img/check.svg");
+        position: absolute;
+        left: 16px;
+        top: calc(50% - 12px);
+      }
+
+      input {
+        display: none;
+      }
+    }
+
+    span {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  input[type='text'] {
+    padding-left: 12px;
+    position: absolute;
+    left: 50px;
+    top: 0;
+    box-sizing: border-box;
+    width: calc(100% - 50px);
+    z-index: 2;
+  }
+
+  .delete-icon {
+    position: absolute;
+    top: calc(50% - 10px);
+    right: 10px;
+    z-index: 1;
+    cursor: pointer;
+    display: none;
+
+    &:hover svg {
+      fill: #cf7d7d;
+    }
+  }
+
+  &:hover .delete-icon {
+    display: block;
+  }
+}
