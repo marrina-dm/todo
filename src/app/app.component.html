@@ -6,7 +6,7 @@
 <main class="todo">
   <div class="container">
     <div class="todo-head">
-      <button class="btn toggle-all-btn" [class.all-completed]="allCompleted" *ngIf="tasks.length > 0" (click)="toggleAllTasks()">
+      <button class="btn toggle-all-btn" [class.all-completed]="allCompleted" *ngIf="(tasks | async)?.length" (click)="toggleAllTasks()">
         <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z"/>
@@ -15,10 +15,10 @@
       <input autofocus type="text" placeholder="What needs to be done?" [(ngModel)]="taskValue"
              (keyup.enter)="addTask()">
     </div>
-    <div class="todo-tasks" *ngIf="tasks.length > 0">
-      <task (remove)="removeTask($event)" (onChangeState)="countLeftTasks()" *ngFor="let task of tasks" [task]="task"></task>
+    <div class="todo-tasks" *ngIf="(tasks | async)?.length">
+      <task (remove)="removeTask($event)" (onChangeState)="countLeftTasks()" *ngFor="let task of tasks | async" [task]="task"></task>
     </div>
-    <div class="todo-actions" *ngIf="allTasks.length > 0">
+    <div class="todo-actions" *ngIf="(tasks | async)?.length || countLeft > 0 || someCompleted">
       <div class="count-tasks">{{ countLeft }} {{ countLeft === 1 ? 'item' : 'items' }} left</div>
       <div class="filter-tasks">
         <mat-button-toggle-group appearance="legacy" [formControl]="filterTasksControl" (click)="filterTasks()">

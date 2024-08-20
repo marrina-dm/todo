@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {TaskType} from "../types/task.type";
 import {FormControl} from "@angular/forms";
 import {TaskService} from "./services/task.service";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'app-root',
@@ -9,8 +10,7 @@ import {TaskService} from "./services/task.service";
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-  public allTasks: TaskType[] = [];
-  public tasks: TaskType[] = [];
+  public tasks: Observable<TaskType[]> | null = null;
   public filterTasksControl = new FormControl('all');
   public taskValue: string = '';
   public countLeft: number = 0;
@@ -21,10 +21,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.taskService.tasks$.subscribe((tasks: TaskType[]) => {
-      this.tasks = tasks;
-      this.allTasks = this.taskService.getTasks();
-    });
+    this.tasks = this.taskService.getTasks();
   }
 
   addTask(): void {
@@ -47,21 +44,22 @@ export class AppComponent implements OnInit {
   }
 
   clearCompleted(): void {
-    this.taskService.clearCompleted(this.filterTasksControl.value!);
-    this.someCompleted = this.allTasks.some((item: TaskType) => item.complete);
+    this.taskService.clearCompleted();
+    this.filterTasks();
+    this.someCompleted = false;
   }
 
   countLeftTasks(): void {
-    this.countLeft = this.allTasks.filter((item: TaskType) => !item.complete).length;
-    if (this.countLeft === 0) {
-      this.allCompleted = true;
-    }
+    this.countLeft = this.taskService.getCountLeftTasks();
+    this.allCompleted = this.countLeft === 0;
 
-    this.someCompleted = this.allTasks.some((item: TaskType) => item.complete);
+    this.someCompleted = this.taskService.isSomeCompleted();
     this.filterTasks();
   }
 
   filterTasks(): void {
-    this.tasks = this.taskService.getTasks(this.filterTasksControl.value!);
+    if (this.filterTasksControl.value) {
+      this.tasks = this.taskService.getTasks(this.filterTasksControl.value);
+    }
   }
 }

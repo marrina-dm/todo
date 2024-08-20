@@ -1,12 +1,11 @@
 import {Injectable} from '@angular/core';
 import {TaskType} from "../../types/task.type";
-import {Subject} from "rxjs";
+import {Observable} from "rxjs";
 
 @Injectable({
     providedIn: 'root'
 })
 export class TaskService {
-    public tasks$: Subject<TaskType[]> = new Subject();
     private tasks: TaskType[] = [];
 
     constructor() {
@@ -17,29 +16,27 @@ export class TaskService {
             title: title,
             complete: false
         });
-        this.tasks$.next(this.tasks);
     }
 
-    getTasks(filter: string = 'all'): TaskType[] {
+    getTasks(filter: string = 'all'): Observable<TaskType[]> {
+        let tasks = this.tasks;
         if (filter === 'active') {
-            return this.tasks.filter((item: TaskType) => !item.complete);
+            tasks = this.tasks.filter((item: TaskType) => !item.complete);
         }
 
         if (filter === 'completed') {
-            return this.tasks.filter((item: TaskType) => item.complete);
+            tasks = this.tasks.filter((item: TaskType) => item.complete);
         }
 
-        return this.tasks;
+        return new Observable<TaskType[]>(observer => {observer.next(tasks)});
     }
 
     removeTask(task: TaskType): void {
         this.tasks = this.tasks.filter((item: TaskType) => item !== task);
-        this.tasks$.next(this.tasks);
     }
 
-    clearCompleted(filterValue: string): void {
+    clearCompleted(): void {
         this.tasks = this.tasks.filter((item: TaskType) => !item.complete);
-        this.tasks$.next(this.getTasks(filterValue));
     }
 
     toggleAllTasks(): boolean {
@@ -50,5 +47,13 @@ export class TaskService {
             this.tasks.map(item => item.complete = false);
             return  false;
         }
+    }
+
+    getCountLeftTasks(): number {
+        return this.tasks.filter((item: TaskType) => !item.complete).length;
+    }
+
+    isSomeCompleted(): boolean {
+        return this.tasks.some((item: TaskType) => item.complete);
     }
 }

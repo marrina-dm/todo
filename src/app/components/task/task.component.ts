@@ -16,7 +16,7 @@ import {TaskType} from "../../../types/task.type";
   styleUrl: './task.component.scss'
 })
 export class TaskComponent implements OnInit, AfterContentChecked {
-  @Input() task!: TaskType;
+  @Input() task: TaskType = {} as TaskType;
   @ViewChild('inputElement') inputElement?: ElementRef;
   @Output() remove = new EventEmitter<TaskType>();
   @Output() onChangeState = new EventEmitter<void>();

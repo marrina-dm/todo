@@ -1,4 +1,4 @@
-<div class="task" tabindex="0">
+<div class="task" tabindex="0" *ngIf="task">
   <div class="check-task">
     <label>
       <input type="checkbox" [checked]="task.complete" (click)="changeStateTask()">
