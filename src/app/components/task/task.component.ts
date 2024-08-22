@@ -9,6 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {TaskType} from "../../../types/task.type";
+import {TaskService} from "../../services/task.service";
 
 @Component({
   selector: 'task',
@@ -18,10 +19,12 @@ import {TaskType} from "../../../types/task.type";
 export class TaskComponent implements OnInit, AfterContentChecked {
   @Input() task?: TaskType;
   @ViewChild('inputElement') inputElement?: ElementRef;
-  @Output() remove = new EventEmitter<TaskType>();
   @Output() onChangeState = new EventEmitter<void>();
   public displayInput: boolean = false;
   public title: string = '';
+
+  constructor(private taskService: TaskService) {
+  }
 
   ngOnInit(): void {
     if (this.task) {
@@ -45,7 +48,9 @@ export class TaskComponent implements OnInit, AfterContentChecked {
   }
 
   removeTask(): void {
-    this.remove.emit(this.task);
+    if (this.task) {
+      this.taskService.removeTask(this.task);
+    }
     this.onChangeState.emit();
   }
 
