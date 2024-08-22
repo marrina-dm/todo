@@ -1,59 +1,100 @@
 import {Injectable} from '@angular/core';
 import {TaskType} from "../../types/task.type";
-import {Observable} from "rxjs";
+import {map, Observable, of, tap} from "rxjs";
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class TaskService {
-    private tasks: TaskType[] = [];
+  private tasks: Observable<TaskType[]> = of([]);
 
-    constructor() {
-    }
+  constructor() {
+  }
 
-    addTask(title: string): void {
-        this.tasks.push({
-            title: title,
-            complete: false
+  addTask(title: string): void {
+    this.tasks.pipe(tap(data => {
+        data.push({
+          title: title,
+          complete: false
         });
+        return data;
+      }
+    )).subscribe();
+  }
+
+  getTasks(filters: string = 'all'): Observable<TaskType[]> {
+    let tasks = this.tasks;
+    if (filters === 'active') {
+      tasks = this.tasks.pipe(
+        map(data => data.filter((item: TaskType) => !item.complete))
+      );
     }
 
-    getTasks(filter: string = 'all'): Observable<TaskType[]> {
-        let tasks = this.tasks;
-        if (filter === 'active') {
-            tasks = this.tasks.filter((item: TaskType) => !item.complete);
+    if (filters === 'completed') {
+      tasks = this.tasks.pipe(
+        map(data => data.filter((item: TaskType) => item.complete))
+      );
+    }
+
+    return tasks;
+  }
+
+  removeTask(task: TaskType): Observable<TaskType[]> {
+    this.tasks = this.tasks.pipe(
+      map(data => data.filter((item: TaskType) => item !== task))
+    );
+
+    this.tasks.pipe(
+      tap(data => {
+        if (data.length === 0) {
+          this.tasks = of([]);
         }
+      })
+    ).subscribe();
 
-        if (filter === 'completed') {
-            tasks = this.tasks.filter((item: TaskType) => item.complete);
+    return this.tasks;
+  }
+
+  clearCompleted(): Observable<TaskType[]> {
+    this.tasks = this.tasks.pipe(
+      map(data => data.filter((item: TaskType) => !item.complete))
+    );
+
+    this.tasks.pipe(
+      tap(data => {
+        if (data.length === 0) {
+          this.tasks = of([]);
         }
+      })
+    ).subscribe();
 
-        return new Observable<TaskType[]>(observer => {observer.next(tasks)});
-    }
+    return this.tasks;
+  }
 
-    removeTask(task: TaskType): void {
-        this.tasks = this.tasks.filter((item: TaskType) => item !== task);
-    }
-
-    clearCompleted(): void {
-        this.tasks = this.tasks.filter((item: TaskType) => !item.complete);
-    }
-
-    toggleAllTasks(): boolean {
-        if (this.tasks.some((item: TaskType) => !item.complete)) {
-            this.tasks.map(item => item.complete = true);
-            return true;
+  toggleAllTasks(isAllCompleted: boolean = false): boolean {
+    this.tasks.pipe(
+      map(data => {
+        if (!isAllCompleted) {
+          data.map(item => item.complete = true);
         } else {
-            this.tasks.map(item => item.complete = false);
-            return  false;
+          data.map(item => item.complete = false);
         }
-    }
 
-    getCountLeftTasks(): number {
-        return this.tasks.filter((item: TaskType) => !item.complete).length;
-    }
+        return data;
+      })
+    ).subscribe();
 
-    isSomeCompleted(): boolean {
-        return this.tasks.some((item: TaskType) => item.complete);
-    }
+    return !isAllCompleted;
+  }
+
+  getCountLeftTasks(): Observable<number> {
+    return this.tasks.pipe(
+      map(data => data.filter((item: TaskType) => !item.complete).length));
+  }
+
+  isSomeCompleted(): Observable<boolean> {
+    return this.tasks.pipe(
+      map(data => data.some((item: TaskType) => item.complete))
+    );
+  }
 }

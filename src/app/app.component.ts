@@ -10,12 +10,12 @@ import {Observable} from "rxjs";
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-  public tasks: Observable<TaskType[]> | null = null;
+  public tasks?: Observable<TaskType[]>;
   public filterTasksControl = new FormControl('all');
   public taskValue: string = '';
-  public countLeft: number = 0;
+  public countLeft?: Observable<number>;
   public allCompleted: boolean = false;
-  public someCompleted: boolean = false;
+  public someCompleted?: Observable<boolean>;
 
   constructor(private taskService: TaskService) {
   }
@@ -29,29 +29,27 @@ export class AppComponent implements OnInit {
       this.taskService.addTask(this.taskValue);
 
       this.taskValue = '';
-      this.countLeft++;
-      this.filterTasks();
+      this.countLeftTasks();
     }
   }
 
   removeTask(task: TaskType): void {
-    this.taskService.removeTask(task);
+    this.tasks = this.taskService.removeTask(task);
   }
 
   toggleAllTasks(): void {
-    this.allCompleted = this.taskService.toggleAllTasks();
+    this.allCompleted = this.taskService.toggleAllTasks(this.allCompleted);
     this.countLeftTasks();
   }
 
   clearCompleted(): void {
-    this.taskService.clearCompleted();
+    this.tasks = this.taskService.clearCompleted();
+    this.someCompleted = this.taskService.isSomeCompleted();
     this.filterTasks();
-    this.someCompleted = false;
   }
 
   countLeftTasks(): void {
     this.countLeft = this.taskService.getCountLeftTasks();
-    this.allCompleted = this.countLeft === 0;
 
     this.someCompleted = this.taskService.isSomeCompleted();
     this.filterTasks();
