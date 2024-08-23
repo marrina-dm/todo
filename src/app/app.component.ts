@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {TaskType} from "../types/task.type";
 import {FormControl} from "@angular/forms";
 import {TaskService} from "./services/task.service";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 
 @Component({
   selector: 'app-root',
@@ -13,15 +13,18 @@ export class AppComponent implements OnInit {
   public tasks$?: BehaviorSubject<TaskType[]>;
   public filterTasksControl = new FormControl('all');
   public taskValue: string = '';
-  public countLeft: number = 0;
-  public allCompleted: boolean = false;
-  public someCompleted: boolean = false;
+  public countLeft$?: BehaviorSubject<number>;
+  public someCompleted$?: Observable<boolean>;
+  public isDisplayActions$?: Observable<boolean>;
 
   constructor(private taskService: TaskService) {
   }
 
   ngOnInit(): void {
     this.tasks$ = this.taskService.tasks$;
+    this.someCompleted$ = this.taskService.isSomeCompleted$;
+    this.countLeft$ = this.taskService.countLeft$;
+    this.isDisplayActions$ = combineLatest(this.tasks$, this.someCompleted$, this.countLeft$, (tasks, someCompleted, countLeft) => tasks.length > 0 || !!countLeft || someCompleted);
   }
 
   addTask(): void {
@@ -29,24 +32,24 @@ export class AppComponent implements OnInit {
       this.taskService.addTask(this.taskValue);
 
       this.taskValue = '';
-      this.countLeft++;
+      this.countLeftTasks();
     }
   }
 
   toggleAllTasks(): void {
-    this.allCompleted = this.taskService.toggleAllTasks();
+    this.taskService.toggleAllTasks();
     this.countLeftTasks();
   }
 
   clearCompleted(): void {
     this.taskService.clearCompleted();
-    this.someCompleted = this.taskService.isSomeCompleted();
+    this.taskService.isSomeCompleted();
     this.filterTasks();
   }
 
   countLeftTasks(): void {
-    this.countLeft = this.taskService.getCountLeftTasks();
-    this.someCompleted = this.taskService.isSomeCompleted();
+    this.taskService.getCountLeftTasks();
+    this.taskService.isSomeCompleted();
     this.filterTasks();
   }
 

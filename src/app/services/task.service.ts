@@ -1,12 +1,14 @@
 import {Injectable} from '@angular/core';
 import {TaskType} from "../../types/task.type";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TaskService {
   public tasks$: BehaviorSubject<TaskType[]> = new BehaviorSubject<TaskType[]>([]);
+  public countLeft$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  public isSomeCompleted$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   addTask(title: string): void {
     const oldTasks: TaskType[] = this.tasks$.getValue();
@@ -15,20 +17,12 @@ export class TaskService {
       title: title,
       complete: false
     };
-    console.log(this.tasks$);
     this.tasks$.next([...oldTasks, newTask]);
   }
 
   getTasks(filters: string = 'all'): BehaviorSubject<TaskType[]> {
     let tasks = this.tasks$.getValue();
-    if (filters === 'active') {
-      tasks = tasks.filter((item: TaskType) => !item.complete);
-    }
-
-    if (filters === 'completed') {
-      tasks = tasks.filter((item: TaskType) => item.complete);
-    }
-
+    tasks = filters === 'all' ? tasks : tasks.filter((item: TaskType) => filters === 'active' ? !item.complete : item.complete);
     return new BehaviorSubject<TaskType[]>(tasks);
   }
 
@@ -45,22 +39,17 @@ export class TaskService {
     this.tasks$.next(newTasks);
   }
 
-  toggleAllTasks(): boolean {
+  toggleAllTasks(): void {
     const oldTasks: TaskType[] = this.tasks$.getValue();
-    if (oldTasks.some((item: TaskType) => !item.complete)) {
-      oldTasks.map(item => item.complete = true);
-      return true;
-    } else {
-      oldTasks.map(item => item.complete = false);
-      return false;
-    }
+    const someCompleted = oldTasks.some((item: TaskType) => !item.complete);
+    oldTasks.map(item => item.complete = someCompleted);
   }
 
-  getCountLeftTasks(): number {
-    return this.tasks$.getValue().filter((item: TaskType) => !item.complete).length;
+  getCountLeftTasks(): void {
+    this.countLeft$.next(this.tasks$.getValue().filter((item: TaskType) => !item.complete).length);
   }
 
-  isSomeCompleted(): boolean {
-    return this.tasks$.getValue().some((item: TaskType) => item.complete);
+  isSomeCompleted(): void {
+    this.isSomeCompleted$.next(this.tasks$.getValue().some((item: TaskType) => item.complete));
   }
 }
