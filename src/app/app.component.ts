@@ -10,10 +10,10 @@ import {BehaviorSubject, combineLatest, Observable} from "rxjs";
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-  public tasks$?: BehaviorSubject<TaskType[]>;
+  public tasks$?: Observable<TaskType[]>;
   public filterTasksControl = new FormControl('all');
   public taskValue: string = '';
-  public countLeft$?: BehaviorSubject<number>;
+  public countLeft$?: Observable<number>;
   public someCompleted$?: Observable<boolean>;
   public isDisplayActions$?: Observable<boolean>;
 
@@ -22,8 +22,8 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.tasks$ = this.taskService.tasks$;
-    this.someCompleted$ = this.taskService.isSomeCompleted$;
-    this.countLeft$ = this.taskService.countLeft$;
+    this.someCompleted$ = this.taskService.isSomeCompleted();
+    this.countLeft$ = this.taskService.getCountLeftTasks();
     this.isDisplayActions$ = combineLatest(this.tasks$, this.someCompleted$, this.countLeft$, (tasks, someCompleted, countLeft) => tasks.length > 0 || !!countLeft || someCompleted);
   }
 
@@ -48,8 +48,8 @@ export class AppComponent implements OnInit {
   }
 
   countLeftTasks(): void {
-    this.taskService.getCountLeftTasks();
-    this.taskService.isSomeCompleted();
+    this.countLeft$ = this.taskService.getCountLeftTasks();
+    this.someCompleted$ = this.taskService.isSomeCompleted();
     this.filterTasks();
   }
 

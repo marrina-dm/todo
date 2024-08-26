@@ -1,14 +1,12 @@
 import {Injectable} from '@angular/core';
 import {TaskType} from "../../types/task.type";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, map, Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TaskService {
   public tasks$: BehaviorSubject<TaskType[]> = new BehaviorSubject<TaskType[]>([]);
-  public countLeft$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
-  public isSomeCompleted$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   addTask(title: string): void {
     const oldTasks: TaskType[] = this.tasks$.getValue();
@@ -20,10 +18,10 @@ export class TaskService {
     this.tasks$.next([...oldTasks, newTask]);
   }
 
-  getTasks(filters: string = 'all'): BehaviorSubject<TaskType[]> {
-    let tasks = this.tasks$.getValue();
-    tasks = filters === 'all' ? tasks : tasks.filter((item: TaskType) => filters === 'active' ? !item.complete : item.complete);
-    return new BehaviorSubject<TaskType[]>(tasks);
+  getTasks(filters: string = 'all'): Observable<TaskType[]> {
+    return this.tasks$.pipe(
+      map(tasks => filters === 'all' ? tasks : tasks.filter((item: TaskType) => filters === 'active' ? !item.complete : item.complete))
+    );
   }
 
   removeTask(task: TaskType): void {
@@ -45,11 +43,15 @@ export class TaskService {
     oldTasks.map(item => item.complete = someCompleted);
   }
 
-  getCountLeftTasks(): void {
-    this.countLeft$.next(this.tasks$.getValue().filter((item: TaskType) => !item.complete).length);
+  getCountLeftTasks(): Observable<number> {
+    return this.tasks$.pipe(
+      map((tasks: TaskType[]) => tasks.filter((item: TaskType) => !item.complete).length)
+    );
   }
 
-  isSomeCompleted(): void {
-    this.isSomeCompleted$.next(this.tasks$.getValue().some((item: TaskType) => item.complete));
+  isSomeCompleted(): Observable<boolean> {
+    return this.tasks$.pipe(
+      map((tasks: TaskType[]) => tasks.some((item: TaskType) => item.complete))
+    );
   }
 }
