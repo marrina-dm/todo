@@ -31,7 +31,6 @@ export class TaskService {
       } else {
         task.title = title;
         task.complete = complete;
-
         this.tasks$.next(oldTasks);
       }
     }
