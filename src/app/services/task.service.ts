@@ -7,6 +7,10 @@ import {BehaviorSubject, map, Observable} from "rxjs";
 })
 export class TaskService {
   public tasks$: BehaviorSubject<TaskType[]> = new BehaviorSubject<TaskType[]>([]);
+  public getCountLeftTasks$: Observable<number> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => !item.complete).length));
+  public isSomeCompleted$: Observable<boolean> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.some((item: TaskType) => item.complete)));
+  public getActiveTasks$: Observable<TaskType[]> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => !item.complete)));
+  public getCompletedTasks$: Observable<TaskType[]> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => item.complete)));
 
   addTask(title: string): void {
     const oldTasks: TaskType[] = this.tasks$.getValue();
@@ -18,10 +22,23 @@ export class TaskService {
     this.tasks$.next([...oldTasks, newTask]);
   }
 
-  getTasks(filters: string = 'all'): Observable<TaskType[]> {
-    return this.tasks$.pipe(
-      map(tasks => filters === 'all' ? tasks : tasks.filter((item: TaskType) => filters === 'active' ? !item.complete : item.complete))
-    );
+  updateTask(id: number, title: string, complete: boolean): void {
+    const oldTasks: TaskType[] = this.tasks$.getValue();
+    const taskIndex: number = oldTasks.findIndex((item: TaskType) => item.id === id);
+    if (taskIndex != -1) {
+      if (!title) {
+        this.removeTask(oldTasks[taskIndex]);
+      } else {
+        const newTask: TaskType = {
+          id: id,
+          title: title,
+          complete: complete
+        };
+
+        oldTasks.splice(taskIndex, 1, newTask);
+        this.tasks$.next(oldTasks);
+      }
+    }
   }
 
   removeTask(task: TaskType): void {
@@ -32,26 +49,13 @@ export class TaskService {
   }
 
   clearCompleted(): void {
-    const oldTasks: TaskType[] = this.tasks$.getValue();
-    const newTasks: TaskType[] = oldTasks.filter((item: TaskType) => !item.complete);
-    this.tasks$.next(newTasks);
+    this.tasks$.next(this.tasks$.getValue().filter((item: TaskType) => !item.complete));
   }
 
   toggleAllTasks(): void {
     const oldTasks: TaskType[] = this.tasks$.getValue();
     const someCompleted = oldTasks.some((item: TaskType) => !item.complete);
     oldTasks.map(item => item.complete = someCompleted);
-  }
-
-  getCountLeftTasks(): Observable<number> {
-    return this.tasks$.pipe(
-      map((tasks: TaskType[]) => tasks.filter((item: TaskType) => !item.complete).length)
-    );
-  }
-
-  isSomeCompleted(): Observable<boolean> {
-    return this.tasks$.pipe(
-      map((tasks: TaskType[]) => tasks.some((item: TaskType) => item.complete))
-    );
+    this.tasks$.next(oldTasks);
   }
 }
