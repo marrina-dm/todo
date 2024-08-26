@@ -1,11 +1,9 @@
 import {
-  AfterContentChecked, ChangeDetectorRef,
+  AfterContentChecked,
   Component,
   ElementRef,
-  EventEmitter,
   Input,
   OnInit,
-  Output,
   ViewChild
 } from '@angular/core';
 import {TaskType} from "../../../types/task.type";
@@ -19,7 +17,6 @@ import {TaskService} from "../../services/task.service";
 export class TaskComponent implements OnInit, AfterContentChecked {
   @Input() task?: TaskType;
   @ViewChild('inputElement') inputElement?: ElementRef;
-  @Output() onChangeState = new EventEmitter<void>();
   public displayInput: boolean = false;
   public title: string = '';
 
@@ -42,8 +39,7 @@ export class TaskComponent implements OnInit, AfterContentChecked {
 
   changeStateTask(): void {
     if (this.task) {
-      this.task.complete = !this.task.complete;
-      this.onChangeState.emit();
+      this.taskService.updateTask(this.task.id, this.title, !this.task.complete);
     }
   }
 
@@ -51,7 +47,6 @@ export class TaskComponent implements OnInit, AfterContentChecked {
     if (this.task) {
       this.taskService.removeTask(this.task);
     }
-    this.onChangeState.emit();
   }
 
   focusInput(): void {
@@ -66,10 +61,8 @@ export class TaskComponent implements OnInit, AfterContentChecked {
   }
 
   updateTask(): void {
-    if (!this.title) {
-      this.removeTask();
-    } else if (this.task) {
-      this.task.title = this.title;
+    if (this.task) {
+      this.taskService.updateTask(this.task.id, this.title, this.task.complete);
     }
 
     this.blurInput();
