@@ -18,6 +18,7 @@ export class TaskComponent implements OnInit, AfterContentChecked {
   @Input() task?: TaskType;
   @ViewChild('inputElement') inputElement?: ElementRef;
   public isDisplayInput: boolean = false;
+  public isCompleted: boolean = false;
   public title: string = '';
 
   constructor(private taskService: TaskService) {
@@ -26,6 +27,7 @@ export class TaskComponent implements OnInit, AfterContentChecked {
   ngOnInit(): void {
     if (this.task) {
       this.title = this.task.title;
+      this.isCompleted = this.task.complete;
     }
   }
 
@@ -37,12 +39,12 @@ export class TaskComponent implements OnInit, AfterContentChecked {
     }
   }
 
-  changeStateTask(): void {
+  updateTask(): void {
     if (this.task) {
       this.taskService.updateTask({
-        id: this.task.id,
+        ...this.task,
         title: this.title,
-        complete: !this.task.complete
+        complete: this.isCompleted
       });
     }
   }
@@ -62,17 +64,5 @@ export class TaskComponent implements OnInit, AfterContentChecked {
     if (this.task) {
       this.title = this.task.title;
     }
-  }
-
-  updateTask(): void {
-    if (this.task) {
-      this.taskService.updateTask({
-        id: this.task.id,
-        title: this.title,
-        complete: this.task.complete
-      });
-    }
-
-    this.blurInput();
   }
 }

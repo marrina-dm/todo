@@ -1,7 +1,7 @@
 <div class="task" tabindex="0" *ngIf="task">
   <div class="check-task">
     <label>
-      <input type="checkbox" [checked]="task.complete" (click)="changeStateTask()">
+      <input type="checkbox" [(ngModel)]="isCompleted" (change)="updateTask()">
     </label>
     <span (dblclick)="focusInput()">{{ task.title }}</span>
   </div>

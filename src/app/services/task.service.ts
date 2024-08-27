@@ -13,28 +13,31 @@ export class TaskService {
   public completedTasks$: Observable<TaskType[]> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => item.complete)));
 
   addTask(title: string): void {
-    const oldTasks: TaskType[] = this.tasks$.getValue();
-    const newTask: TaskType = {
+    this.tasks$.next([...this.tasks$.getValue(), {
       id: Date.now(),
       title: title,
       complete: false
-    };
-    this.tasks$.next([...oldTasks, newTask]);
+    }]);
   }
 
   updateTask(task: TaskType): void {
-    const oldTasks: TaskType[] = this.tasks$.getValue();
-    const taskIndex: number = oldTasks.findIndex((item: TaskType) => item.id === task.id);
-    task.title ? oldTasks.splice(taskIndex, 1, task) : oldTasks.splice(taskIndex, 1);
-    this.tasks$.next(oldTasks);
+    let oldTasks: TaskType[] = this.tasks$.getValue();
+    const tasksIndex: number = oldTasks.findIndex((item: TaskType) => item.id === task.id);
+    if (tasksIndex !== -1) {
+      if (!task.title) {
+        oldTasks.splice(tasksIndex, 1);
+        this.tasks$.next(oldTasks);
+      } else {
+        this.tasks$.next(oldTasks.map((item, index) => index === tasksIndex ? task : item));
+      }
+    }
   }
 
   removeTask(task: TaskType): void {
-    this.updateTask({
-      id: task.id,
-      title: '',
-      complete: task.complete
-    });
+    const oldTasks: TaskType[] = this.tasks$.getValue();
+    const oldTasksIndex: number = oldTasks.findIndex((item: TaskType) => item.id === task.id);
+    oldTasks.splice(oldTasksIndex, 1);
+    this.tasks$.next(oldTasks);
   }
 
   clearCompleted(): void {
