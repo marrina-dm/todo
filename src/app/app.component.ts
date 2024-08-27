@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.tasks$ = this.taskService.tasks$;
     this.someCompleted$ = this.taskService.isSomeCompleted$;
-    this.countLeft$ = this.taskService.getCountLeftTasks$;
+    this.countLeft$ = this.taskService.countLeftTasks$;
     this.isDisplayActions$ = combineLatest(this.tasks$, this.someCompleted$, this.countLeft$,
       (tasks, someCompleted, countLeft) => tasks.length > 0 || !!countLeft || someCompleted);
   }
@@ -45,7 +45,7 @@ export class AppComponent implements OnInit {
   filterTasks(): void {
     if (this.filterTasksControl.value) {
       this.tasks$ = this.filterTasksControl.value === 'all' ? this.taskService.tasks$ :
-        (this.filterTasksControl.value === 'active' ? this.taskService.getActiveTasks$ : this.taskService.getCompletedTasks$);
+        (this.filterTasksControl.value === 'active' ? this.taskService.activeTasks$ : this.taskService.completedTasks$);
     }
   }
 }

@@ -7,10 +7,10 @@ import {BehaviorSubject, map, Observable} from "rxjs";
 })
 export class TaskService {
   public tasks$: BehaviorSubject<TaskType[]> = new BehaviorSubject<TaskType[]>([]);
-  public getCountLeftTasks$: Observable<number> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => !item.complete).length));
+  public countLeftTasks$: Observable<number> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => !item.complete).length));
   public isSomeCompleted$: Observable<boolean> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.some((item: TaskType) => item.complete)));
-  public getActiveTasks$: Observable<TaskType[]> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => !item.complete)));
-  public getCompletedTasks$: Observable<TaskType[]> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => item.complete)));
+  public activeTasks$: Observable<TaskType[]> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => !item.complete)));
+  public completedTasks$: Observable<TaskType[]> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => item.complete)));
 
   addTask(title: string): void {
     const oldTasks: TaskType[] = this.tasks$.getValue();
@@ -22,18 +22,11 @@ export class TaskService {
     this.tasks$.next([...oldTasks, newTask]);
   }
 
-  updateTask(id: number, title: string, complete: boolean): void {
+  updateTask(task: TaskType): void {
     const oldTasks: TaskType[] = this.tasks$.getValue();
-    const task: TaskType | undefined = oldTasks.find((item: TaskType) => item.id === id);
-    if (task) {
-      if (!title) {
-        this.removeTask(task);
-      } else {
-        task.title = title;
-        task.complete = complete;
-        this.tasks$.next(oldTasks);
-      }
-    }
+    const taskIndex: number = oldTasks.findIndex((item: TaskType) => item.id === task.id);
+    task.title ? oldTasks.splice(taskIndex, 1, task) : oldTasks.splice(taskIndex, 1);
+    this.tasks$.next(oldTasks);
   }
 
   removeTask(task: TaskType): void {

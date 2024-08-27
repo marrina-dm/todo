@@ -17,7 +17,7 @@ import {TaskService} from "../../services/task.service";
 export class TaskComponent implements OnInit, AfterContentChecked {
   @Input() task?: TaskType;
   @ViewChild('inputElement') inputElement?: ElementRef;
-  public displayInput: boolean = false;
+  public isDisplayInput: boolean = false;
   public title: string = '';
 
   constructor(private taskService: TaskService) {
@@ -30,7 +30,7 @@ export class TaskComponent implements OnInit, AfterContentChecked {
   }
 
   ngAfterContentChecked(): void {
-    if (this.displayInput) {
+    if (this.isDisplayInput) {
       this.inputElement?.nativeElement.focus();
     } else {
       this.inputElement?.nativeElement.blur();
@@ -39,7 +39,11 @@ export class TaskComponent implements OnInit, AfterContentChecked {
 
   changeStateTask(): void {
     if (this.task) {
-      this.taskService.updateTask(this.task.id, this.title, !this.task.complete);
+      this.taskService.updateTask({
+        id: this.task.id,
+        title: this.title,
+        complete: !this.task.complete
+      });
     }
   }
 
@@ -50,11 +54,11 @@ export class TaskComponent implements OnInit, AfterContentChecked {
   }
 
   focusInput(): void {
-    this.displayInput = true;
+    this.isDisplayInput = true;
   }
 
   blurInput(): void {
-    this.displayInput = false;
+    this.isDisplayInput = false;
     if (this.task) {
       this.title = this.task.title;
     }
@@ -62,7 +66,11 @@ export class TaskComponent implements OnInit, AfterContentChecked {
 
   updateTask(): void {
     if (this.task) {
-      this.taskService.updateTask(this.task.id, this.title, this.task.complete);
+      this.taskService.updateTask({
+        id: this.task.id,
+        title: this.title,
+        complete: this.task.complete
+      });
     }
 
     this.blurInput();
