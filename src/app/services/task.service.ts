@@ -30,10 +30,11 @@ export class TaskService {
   }
 
   removeTask(task: TaskType): void {
-    const oldTasks: TaskType[] = this.tasks$.getValue();
-    const oldTasksIndex: number = oldTasks.findIndex((item: TaskType) => item.id === task.id);
-    oldTasks.splice(oldTasksIndex, 1);
-    this.tasks$.next(oldTasks);
+    this.updateTask({
+      id: task.id,
+      title: '',
+      complete: task.complete
+    });
   }
 
   clearCompleted(): void {
