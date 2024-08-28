@@ -47,7 +47,8 @@ export class TaskService {
   toggleAllTasks(): void {
     const oldTasks: TaskType[] = this.tasks$.getValue();
     const someCompleted = oldTasks.some((item: TaskType) => !item.complete);
-    oldTasks.map(item => item.complete = someCompleted);
-    this.tasks$.next(oldTasks);
+    this.tasks$.next(oldTasks.map(item => {
+      return {...item, complete: someCompleted};
+    }));
   }
 }

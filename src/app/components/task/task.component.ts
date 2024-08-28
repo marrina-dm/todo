@@ -1,5 +1,5 @@
 import {
-  AfterContentChecked,
+  AfterContentChecked, ChangeDetectionStrategy,
   Component,
   ElementRef,
   Input,
@@ -12,7 +12,8 @@ import {TaskService} from "../../services/task.service";
 @Component({
   selector: 'task',
   templateUrl: './task.component.html',
-  styleUrl: './task.component.scss'
+  styleUrl: './task.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskComponent implements OnInit, AfterContentChecked {
   @Input() task?: TaskType;
