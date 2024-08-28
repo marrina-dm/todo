@@ -2,13 +2,12 @@ import {
   AfterContentChecked,
   Component,
   ElementRef,
-  EventEmitter,
   Input,
   OnInit,
-  Output,
   ViewChild
 } from '@angular/core';
 import {TaskType} from "../../../types/task.type";
+import {TaskService} from "../../services/task.service";
 
 @Component({
   selector: 'task',
@@ -16,51 +15,54 @@ import {TaskType} from "../../../types/task.type";
   styleUrl: './task.component.scss'
 })
 export class TaskComponent implements OnInit, AfterContentChecked {
-  @Input() task!: TaskType;
+  @Input() task?: TaskType;
   @ViewChild('inputElement') inputElement?: ElementRef;
-  @Output() remove = new EventEmitter<TaskType>();
-  @Output() onChangeState = new EventEmitter<void>();
-  public displayInput: boolean = false;
+  public isDisplayInput: boolean = false;
+  public isCompleted: boolean = false;
   public title: string = '';
 
+  constructor(private taskService: TaskService) {
+  }
+
   ngOnInit(): void {
-    this.title = this.task.title;
+    if (this.task) {
+      this.title = this.task.title;
+      this.isCompleted = this.task.complete;
+    }
   }
 
   ngAfterContentChecked(): void {
-    if (this.displayInput) {
+    if (this.isDisplayInput) {
       this.inputElement?.nativeElement.focus();
     } else {
       this.inputElement?.nativeElement.blur();
     }
   }
 
-  changeStateTask(): void {
-    this.task.complete = !this.task.complete;
-    this.onChangeState.emit();
+  updateTask(): void {
+    if (this.task) {
+      this.taskService.updateTask({
+        ...this.task,
+        title: this.title,
+        complete: this.isCompleted
+      });
+    }
   }
 
   removeTask(): void {
-    this.remove.emit(this.task);
-    this.onChangeState.emit();
+    if (this.task) {
+      this.taskService.removeTask(this.task);
+    }
   }
 
   focusInput(): void {
-    this.displayInput = true;
+    this.isDisplayInput = true;
   }
 
   blurInput(): void {
-    this.displayInput = false;
-    this.title = this.task.title;
-  }
-
-  updateTask(): void {
-    if (!this.title) {
-      this.removeTask();
-    } else {
-      this.task.title = this.title;
+    this.isDisplayInput = false;
+    if (this.task) {
+      this.title = this.task.title;
     }
-
-    this.blurInput();
   }
 }

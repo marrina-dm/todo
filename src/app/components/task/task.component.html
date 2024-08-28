@@ -1,11 +1,11 @@
-<div class="task" tabindex="0">
+<div class="task" tabindex="0" *ngIf="task">
   <div class="check-task">
     <label>
-      <input type="checkbox" [checked]="task.complete" (click)="changeStateTask()">
+      <input type="checkbox" [(ngModel)]="isCompleted" (change)="updateTask()">
     </label>
     <span (dblclick)="focusInput()">{{ task.title }}</span>
   </div>
-  <input type="text" #inputElement [(ngModel)]="title" *ngIf="displayInput" (blur)="blurInput()" (keyup.enter)="updateTask()">
+  <input type="text" #inputElement [(ngModel)]="title" *ngIf="isDisplayInput" (blur)="blurInput()" (keyup.enter)="updateTask()">
   <div class="delete-icon" (click)="removeTask()">
     <svg fill="#989898" width="20px" height="20px" viewBox="-3.5 0 19 19" xmlns="http://www.w3.org/2000/svg"
          class="cf-icon-svg">

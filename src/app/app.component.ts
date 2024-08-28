@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {TaskType} from "../types/task.type";
 import {FormControl} from "@angular/forms";
 import {TaskService} from "./services/task.service";
+import {combineLatest, Observable} from "rxjs";
 
 @Component({
   selector: 'app-root',
@@ -9,59 +10,42 @@ import {TaskService} from "./services/task.service";
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-  public allTasks: TaskType[] = [];
-  public tasks: TaskType[] = [];
+  public tasks$?: Observable<TaskType[]>;
   public filterTasksControl = new FormControl('all');
   public taskValue: string = '';
-  public countLeft: number = 0;
-  public allCompleted: boolean = false;
-  public someCompleted: boolean = false;
+  public countLeft$?: Observable<number>;
+  public someCompleted$?: Observable<boolean>;
+  public isDisplayActions$?: Observable<boolean>;
 
-  constructor(private taskService: TaskService) {
-  }
+  constructor(private taskService: TaskService) {}
 
   ngOnInit(): void {
-    this.taskService.tasks$.subscribe((tasks: TaskType[]) => {
-      this.tasks = tasks;
-      this.allTasks = this.taskService.getTasks();
-    });
+    this.tasks$ = this.taskService.tasks$;
+    this.someCompleted$ = this.taskService.isSomeCompleted$;
+    this.countLeft$ = this.taskService.countLeftTasks$;
+    this.isDisplayActions$ = combineLatest(this.tasks$, this.someCompleted$, this.countLeft$,
+      (tasks, someCompleted, countLeft) => tasks.length > 0 || !!countLeft || someCompleted);
   }
 
   addTask(): void {
     if (this.taskValue) {
       this.taskService.addTask(this.taskValue);
-
       this.taskValue = '';
-      this.countLeft++;
-      this.filterTasks();
     }
-  }
-
-  removeTask(task: TaskType): void {
-    this.taskService.removeTask(task);
   }
 
   toggleAllTasks(): void {
-    this.allCompleted = this.taskService.toggleAllTasks();
-    this.countLeftTasks();
+    this.taskService.toggleAllTasks();
   }
 
   clearCompleted(): void {
-    this.taskService.clearCompleted(this.filterTasksControl.value!);
-    this.someCompleted = this.allTasks.some((item: TaskType) => item.complete);
-  }
-
-  countLeftTasks(): void {
-    this.countLeft = this.allTasks.filter((item: TaskType) => !item.complete).length;
-    if (this.countLeft === 0) {
-      this.allCompleted = true;
-    }
-
-    this.someCompleted = this.allTasks.some((item: TaskType) => item.complete);
-    this.filterTasks();
+    this.taskService.clearCompleted();
   }
 
   filterTasks(): void {
-    this.tasks = this.taskService.getTasks(this.filterTasksControl.value!);
+    if (this.filterTasksControl.value) {
+      this.tasks$ = this.filterTasksControl.value === 'all' ? this.taskService.tasks$ :
+        (this.filterTasksControl.value === 'active' ? this.taskService.activeTasks$ : this.taskService.completedTasks$);
+    }
   }
 }
