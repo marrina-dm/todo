@@ -1,11 +1,11 @@
-import {Injectable} from '@angular/core';
-import {TaskType} from "../../types/task.type";
+import { Injectable } from '@angular/core';
 import {BehaviorSubject, map, Observable} from "rxjs";
+import {TaskType} from "./types/task.type";
 
 @Injectable({
   providedIn: 'root'
 })
-export class TaskService {
+export class NgxTaskService {
   public tasks$: BehaviorSubject<TaskType[]> = new BehaviorSubject<TaskType[]>([]);
   public countLeftTasks$: Observable<number> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => !item.complete).length));
   public isSomeCompleted$: Observable<boolean> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.some((item: TaskType) => item.complete)));

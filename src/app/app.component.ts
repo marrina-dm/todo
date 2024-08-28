@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import {TaskType} from "../types/task.type";
+import {TaskType} from "ngx-task";
 import {FormControl} from "@angular/forms";
-import {TaskService} from "./services/task.service";
+import {NgxTaskService} from "ngx-task";
 import {combineLatest, Observable} from "rxjs";
 
 @Component({
@@ -18,7 +18,7 @@ export class AppComponent implements OnInit {
   public someCompleted$?: Observable<boolean>;
   public isDisplayActions$?: Observable<boolean>;
 
-  constructor(private taskService: TaskService) {}
+  constructor(private taskService: NgxTaskService) {}
 
   ngOnInit(): void {
     this.tasks$ = this.taskService.tasks$;

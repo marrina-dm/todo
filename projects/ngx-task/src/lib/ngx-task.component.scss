@@ -45,7 +45,7 @@
       }
 
       &:has(>input:checked)::after {
-        content: url("../../../assets/img/check.svg");
+        content: url("assets/img/check.svg");
         position: absolute;
         left: 16px;
         top: calc(50% - 12px);

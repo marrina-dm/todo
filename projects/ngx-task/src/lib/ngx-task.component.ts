@@ -1,28 +1,29 @@
 import {
-  AfterContentChecked, ChangeDetectionStrategy,
+  AfterContentChecked,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   Input,
   OnInit,
   ViewChild
 } from '@angular/core';
-import {TaskType} from "../../../types/task.type";
-import {TaskService} from "../../services/task.service";
+import {TaskType} from "./types/task.type";
+import {NgxTaskService} from "./ngx-task.service";
 
 @Component({
-  selector: 'task',
-  templateUrl: './task.component.html',
-  styleUrl: './task.component.scss',
+  selector: 'ngx-task',
+  templateUrl: './ngx-task.component.html',
+  styleUrl: './ngx-task.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TaskComponent implements OnInit, AfterContentChecked {
+export class NgxTaskComponent implements OnInit, AfterContentChecked {
   @Input() task?: TaskType;
   @ViewChild('inputElement') inputElement?: ElementRef;
   public isDisplayInput: boolean = false;
   public isCompleted: boolean = false;
   public title: string = '';
 
-  constructor(private taskService: TaskService) {
+  constructor(private taskService: NgxTaskService) {
   }
 
   ngOnInit(): void {
