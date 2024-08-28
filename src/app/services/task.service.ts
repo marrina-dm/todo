@@ -28,7 +28,7 @@ export class TaskService {
         oldTasks.splice(tasksIndex, 1);
         this.tasks$.next(oldTasks);
       } else {
-        this.tasks$.next(oldTasks.map((item, index) => index === tasksIndex ? task : item));
+        this.tasks$.next(oldTasks.map(item => task.id === item.id ? task : item));
       }
     }
   }
