@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {TaskType} from "../types/task.type";
 import {FormControl} from "@angular/forms";
 import {TaskService} from "./services/task.service";
@@ -7,7 +7,8 @@ import {combineLatest, Observable} from "rxjs";
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
   public tasks$?: Observable<TaskType[]>;
