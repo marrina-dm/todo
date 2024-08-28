@@ -16,7 +16,7 @@
              (keyup.enter)="addTask()">
     </div>
     <div class="todo-tasks">
-      <task *ngFor="let task of tasks" [task]="task"></task>
+      <ngx-task *ngFor="let task of tasks" [task]="task"></ngx-task>
     </div>
     <div class="todo-actions" *ngIf="isDisplayActions$ | async">
       <div class="count-tasks">{{ count }} {{ +count === 1 ? 'item' : 'items' }} left</div>

@@ -9,6 +9,11 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
+    "paths": {
+      "ngx-task": [
+        "./dist/ngx-task"
+      ]
+    },
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
