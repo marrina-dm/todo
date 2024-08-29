@@ -7,7 +7,7 @@ import {provideAnimationsAsync} from '@angular/platform-browser/animations/async
 import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NgxTaskModule} from "ngx-task";
-import {HTTP_INTERCEPTORS} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {LocalTaskInterceptor} from "./shared/local-task.interceptor";
 
 @NgModule({
@@ -21,7 +21,8 @@ import {LocalTaskInterceptor} from "./shared/local-task.interceptor";
     FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    NgxTaskModule
+    NgxTaskModule,
+    HttpClientModule
   ],
   providers: [
     provideAnimationsAsync(),
