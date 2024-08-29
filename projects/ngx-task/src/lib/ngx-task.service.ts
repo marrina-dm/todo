@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, map, Observable} from "rxjs";
 import {TaskType} from "./types/task.type";
+import {HttpClient} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,12 @@ export class NgxTaskService {
   public isSomeCompleted$: Observable<boolean> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.some((item: TaskType) => item.complete)));
   public activeTasks$: Observable<TaskType[]> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => !item.complete)));
   public completedTasks$: Observable<TaskType[]> = this.tasks$.pipe(map((tasks: TaskType[]) => tasks.filter((item: TaskType) => item.complete)));
+
+  constructor(private http: HttpClient) {}
+
+  getTasks(): Observable<TaskType[]> {
+    return this.http.get<TaskType[]>('http://localhost:8080/api/tasks');
+  }
 
   addTask(title: string): void {
     this.tasks$.next([...this.tasks$.getValue(), {

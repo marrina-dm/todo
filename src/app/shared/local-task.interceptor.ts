@@ -8,8 +8,8 @@ export class LocalTaskInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       tap((event) => {
-        if (req.url.includes('/api/tasklist') && event instanceof HttpResponse) {
-          localStorage.setItem('taskList', JSON.stringify(event.body));
+        if (req.url.includes('/api/tasks') && event instanceof HttpResponse) {
+          localStorage.setItem('tasks', JSON.stringify(event.body));
         }
       })
     );
